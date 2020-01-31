@@ -11,6 +11,7 @@ import MainScreen from '../screens/MainScreen';
 import ContactLocation from '../screens/ContactLocation';
 import Profile from '../screens/Profile';
 import Login from '../screens/Login';
+import Register from '../screens/Register';
 
 const ChatStack = createStackNavigator({
   MainScreen,
@@ -25,7 +26,8 @@ const ProfileStack = createStackNavigator({
 });
 
 const AuthStack = createStackNavigator({
-   Login
+   Login,
+   Register
 
 })
 

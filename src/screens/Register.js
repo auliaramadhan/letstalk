@@ -24,9 +24,9 @@ const Login = props => {
       <Button
         transparent
         style={{marginBottom: 20, justifyContent: 'center'}}
-        onPress={() => props.navigation.navigate('Register')}>
+        onPress={() => props.navigation.navigate('Login')}>
         <Text style={{fontSize: 16}}>
-          Dont have Account?{' '}
+          Already have Account?{' '}
           <Text style={{textDecorationLine: 'underline'}}>Sign up here</Text>
         </Text>
       </Button>
