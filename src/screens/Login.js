@@ -1,18 +1,55 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Container, Form, Input, Item, Label, Button} from 'native-base';
+import firebaseSDK from '../config/firebaseSDK';
 
 const Login = props => {
+  const [input, setInput] = useState({});
+
+  const onPressLogin = async () => {
+    // const user = {
+    //   name: this.state.name,
+    //   email: this.state.email,
+    //   password: this.state.password,
+    //   avatar: this.state.avatar,
+    // };
+
+    const response = firebaseSDK.login(input, loginSuccess, loginFailed);
+  };
+
+  const loginSuccess = () => {
+    console.log('login successful, navigate to chat.');
+    this.props.navigation.navigate('Chat', {user:input});
+  };
+
+  const loginFailed = () => {
+    alert('Login failure. Please tried again.');
+  };
+
   return (
     <Container style={{justifyContent: 'center'}}>
       <Form style={style.form}>
-        <Label>Username</Label>
+        <Label>Email</Label>
         <Item regular>
-          <Input placeholder="username" />
+          <Input
+            placeholder="username"
+            keyboardType="email-address"
+            value={input.email}
+            onChangeText={e => {
+              setInput({...input, email: e});
+            }}
+          />
         </Item>
         <Label>Password</Label>
         <Item regular>
-          <Input secureTextEntry={true} placeholder="password" />
+          <Input
+            secureTextEntry={true}
+            placeholder="password"
+            value={input.password}
+            onChangeText={e => {
+              setInput({...input, password: e});
+            }}
+          />
         </Item>
         <Button
           success
