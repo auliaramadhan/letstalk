@@ -23,6 +23,14 @@ class FirebaseService {
               user.name,
           );
           var userf = firebase.auth().currentUser;
+          console.log(userf.uid)
+          const uid = userf.uid
+          firebase
+            .database()
+            .ref('user')
+            .child(uid)
+            .set({name: user.name, email: user.email, token: uid});
+
           userf.updateProfile({displayName: user.name}).then(
             function() {
               console.log(
@@ -40,9 +48,9 @@ class FirebaseService {
           );
         },
         function(error) {
-          console.error(
-            'got error:' + typeof error + ' string:' + error.message,
-          );
+          // console.error(
+          //   'got error:' + typeof error + ' string:' + error.message,
+          // );
           alert('Create account failed. Error: ' + error.message);
         },
       );
@@ -51,22 +59,14 @@ class FirebaseService {
   async uploadImage(uri) {
     console.log('got image to upload. uri:' + uri);
     try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const ref = firebase
+      console.log(`image =  ${uri}`);
+      const ref = await firebase
         .storage()
-        .ref('avatar')
+        .ref('image').child('avatar')
         .child(uuid.v4());
-      const task = ref.put(blob);
-
-      return new Promise((resolve, reject) => {
-        task.on(
-          'state_changed',
-          () => {},
-         //  reject
-          () => resolve(task.snapshot.downloadURL)
-        );
-      });
+      const task = await ref.put(uri);
+      console.log('hasil ' + task);
+      return task.downloadURL;
     } catch (err) {
       console.log('uploadImage try/catch error: ' + err.message);
     }
@@ -75,7 +75,11 @@ class FirebaseService {
   updateAvatar(url) {
     var userf = firebase.auth().currentUser;
     if (userf != null) {
-      userf.updateProfile({avatar: url}).then(
+      firebase
+        .database()
+        .ref().child('user/' + userf.uid)
+        .child('avatar').set(url);
+      userf.updateProfile({photoURL: url}).then(
         function() {
           console.log('Updated avatar successfully. url:' + url);
           alert('Avatar image is saved successfully.');
@@ -84,11 +88,19 @@ class FirebaseService {
           console.warn('Error update avatar.');
           alert('Error update avatar. Error:' + error.message);
         },
+        console.log(userf),
       );
     } else {
       console.log("can't update avatar, user is not login.");
       alert('Unable to update avatar. You must login first.');
     }
+  }
+
+  userList(setData){
+    const uid = firebase.auth().currentUser.uid;
+    firebase.database().ref().child('user').once('value' , snapshot=>{
+        setData(Object.values(snapshot.val()).filter(v => v.token !== uid));
+    })
   }
 }
 

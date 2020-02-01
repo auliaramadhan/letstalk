@@ -1,27 +1,39 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, StatusBar, FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import firebaseSDK from '../config/firebaseSDK';
+import {ListItem, Left, Thumbnail, Body} from 'native-base';
 
 const MainScreen = props => {
+  const [userList, setUserList] = useState({});
+  useEffect(() => {
+    firebaseSDK.userList(setUserList);
+  }, []);
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#006b3a" />
       <View style={styles.root}>
-        <FlatList
-          data={contact}
-          renderItem={({item}) => (
-            <View style={styles.listChat}>
-              <View style={styles.profilePic}>
-                <Text>{item.name}</Text>
-              </View>
-              <View>
-                <Text style={styles.personName}>{item.name}</Text>
-                <Text style={styles.personChat}>{item.chat}</Text>
-              </View>
-            </View>
-          )}
-          keyExtractor={item => item.id}
-        />
+        {userList && (
+          <FlatList
+            data={userList}
+            renderItem={({item}) => (
+              <ListItem thumbnail>
+                <Left style={{flex: 1, justifyContent: 'center'}}>
+                  {item.avatar ? (
+                    <Thumbnail source={{uri: item.avatar}} />
+                  ) : (
+                    <Icon name="user" size={48} />
+                  )}
+                </Left>
+                <Body style={{flex: 5}}>
+                  <Text style={styles.personName}>{item.name}</Text>
+                  <Text style={styles.personChat}>{item.email}</Text>
+                </Body>
+              </ListItem>
+            )}
+            // keyExtractor={item => item.id.token}
+          />
+        )}
       </View>
     </>
   );

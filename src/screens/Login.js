@@ -13,13 +13,17 @@ const Login = props => {
     //   password: this.state.password,
     //   avatar: this.state.avatar,
     // };
+    if (input.username && input.password) {
+      const response = firebaseSDK.login(input, loginSuccess, loginFailed);
+    } else {
+      alert('fill out the form first')
+    }
 
-    const response = firebaseSDK.login(input, loginSuccess, loginFailed);
   };
 
   const loginSuccess = () => {
     console.log('login successful, navigate to chat.');
-    this.props.navigation.navigate('Chat', {user:input});
+    this.props.navigation.navigate('Chat', {data:input});
   };
 
   const loginFailed = () => {

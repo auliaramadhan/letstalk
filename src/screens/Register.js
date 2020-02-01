@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Container, Form, Input, Item, Label, Button } from 'native-base';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import { Container, Form, Input, Item, Label, Button, Content } from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
 import ImagePicker from 'react-native-image-picker'
 
@@ -20,7 +20,7 @@ const Register = props => {
 		}
 	};
 
-  const onImageUpload = async () => {
+  const onImageUpload = () => {
     const options = {
       title: 'Select Avatar',
       customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
@@ -31,12 +31,8 @@ const Register = props => {
     };
 
 		try {
-			// only if user allows permission to camera roll
-			// if (cameraRollPerm === 'granted') {
-      // }
-
-      await ImagePicker.showImagePicker(options, (response) => {
-        console.log('Response = ', response);
+      ImagePicker.showImagePicker(options, async (response) => {
+        console.log('Response = ', response.uri);
         if (response.didCancel) {
           alert('User cancelled image picker');
         } else if (response.error) {
@@ -44,12 +40,14 @@ const Register = props => {
         } else if (response.customButton) {
           alert('User tapped custom button: ', response.customButton);
         } else {
-          setUser({...user, avatar : response.uri,});
+          const uri = decodeURI(response.uri)
+          const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : response.path;
+          let uploadUrl = await firebaseSDK.uploadImage(uploadUri);
+          // setUser({...user, avatar: uploadUrl });
+          // console.log(user)
+          await firebaseSDK.updateAvatar(uploadUrl);
         }
       });
-      let uploadUrl = await firebaseSDK.uploadImage(user.avatar);
-      setUser({...user, avatar: uploadUrl });
-      await firebaseSDK.updateAvatar(uploadUrl);
 		} catch (err) {
 			console.log('onImageUpload error:' + err.message);
 			alert('Upload image error:' + err.message);
@@ -59,45 +57,48 @@ const Register = props => {
 
   return (
     <Container style={{ justifyContent: 'center' }}>
-      <Form style={style.form}>
-        <Label>Email</Label>
-        <Item regular>
-          <Input placeholder="username"
-            value={user.email}
-            onChangeText={(v) => setUser({ ...user, email: v })}
-          />
-        </Item>
-        <Label>Name</Label>
-        <Item regular>
-          <Input placeholder="username"
-            value={user.name}
-            onChangeText={(v) => setUser({ ...user, name: v })}
-          />
-        </Item>
-        <Label>Password</Label>
-        <Item regular>
-          <Input secureTextEntry={true} placeholder="password"
-            value={user.password}
-            onChangeText={(v) => setUser({ ...user, password: v })}
-          />
-        </Item>
-        <Button success onPress={onImageUpload} style={{ justifyContent: 'center' }}>
-          <Text>upload</Text>
-        </Button>
-        <Button
-          success
-          onPress={onPressCreate}
-          style={{ justifyContent: 'center' }}>
-          <Text>Login</Text>
-        </Button>
-      </Form>
+      <Content>
+        <Form style={style.form}>
+          <Label>Email</Label>
+          <Item regular>
+            <Input placeholder="email"
+            keyboardType='email-address'
+              value={user.email}
+              onChangeText={(v) => setUser({ ...user, email: v })}
+            />
+          </Item>
+          <Label>Name</Label>
+          <Item regular>
+            <Input placeholder="username"
+              value={user.name}
+              onChangeText={(v) => setUser({ ...user, name: v })}
+            />
+          </Item>
+          <Label>Password</Label>
+          <Item regular>
+            <Input secureTextEntry={true} placeholder="password"
+              value={user.password}
+              onChangeText={(v) => setUser({ ...user, password: v })}
+            />
+          </Item>
+          <Button success onPress={onImageUpload} style={{ justifyContent: 'center' }}>
+            <Text>upload</Text>
+          </Button>
+          <Button
+            success
+            onPress={onPressCreate}
+            style={{ justifyContent: 'center' }}>
+            <Text>Register</Text>
+          </Button>
+        </Form>
+      </Content>
       <Button
         transparent
         style={{ marginBottom: 20, justifyContent: 'center' }}
         onPress={() => props.navigation.navigate('Login')}>
         <Text style={{ fontSize: 16 }}>
           Already have Account?{' '}
-          <Text style={{ textDecorationLine: 'underline' }}>Sign up here</Text>
+          <Text style={{ textDecorationLine: 'underline' }}>Login here</Text>
         </Text>
       </Button>
     </Container>
@@ -108,8 +109,8 @@ export default Register;
 
 const style = StyleSheet.create({
   form: {
-    marginTop: 'auto',
-    marginBottom: 'auto',
+    marginTop: 30,
+    marginBottom: 30,
     marginHorizontal: 30,
     height: 400,
     justifyContent: 'space-around',

@@ -12,9 +12,12 @@ import ContactLocation from '../screens/ContactLocation';
 import Profile from '../screens/Profile';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
+import Chat from '../screens/Chat';
 
 const ChatStack = createStackNavigator({
   MainScreen,
+  Chat
+  
 });
 
 const LocationStack = createStackNavigator({
@@ -23,6 +26,8 @@ const LocationStack = createStackNavigator({
 
 const ProfileStack = createStackNavigator({
   Profile,
+},{
+  headerMode:'none'
 });
 
 const AuthStack = createStackNavigator({
@@ -84,7 +89,7 @@ const SwitchContainer = createSwitchNavigator({
   BottomTab,
   AuthStack,
 },{
-   initialRouteName:'AuthStack'
+   initialRouteName:'BottomTab'
 }
 );
 
