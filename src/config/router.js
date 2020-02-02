@@ -105,7 +105,7 @@ const SwitchContainer = createSwitchNavigator(
     AuthStack,
   },
   {
-    initialRouteName: 'AuthStack',
+    initialRouteName: 'SplashScreen',
   },
 );
 

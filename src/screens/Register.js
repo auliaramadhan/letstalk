@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import { Container, Form, Input, Item, Label, Button, Content } from 'native-base';
+import { View, Text, StyleSheet, Platform, ToastAndroid } from 'react-native';
+import { Container, Form, Input, Item, Label, Button, Content, Spinner } from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
 import ImagePicker from 'react-native-image-picker'
 
@@ -9,14 +9,18 @@ import ImagePicker from 'react-native-image-picker'
 const Register = props => {
 
   const [user, setUser] = useState({})
+  const [loadImage, setLoadImage] = useState(false);
 
   const onPressCreate = async () => {
 		try {
+      setLoadImage(true)
+			ToastAndroid.show('user being created please wait', ToastAndroid.SHORT);
 			await firebaseSDK.createAccount(user);
-			alert('create user success:');
+      setLoadImage(false)
 		} catch ({ message }) {
-			console.log('create account failed. catch error:' + message);
-			alert('create account failed. catch error:' + message);
+      console.log('create account failed. catch error:' + message);
+			ToastAndroid.show('create account failed. catch error:' + message, ToastAndroid.SHORT);
+      setLoadImage(false)
 		}
 	};
 
@@ -34,23 +38,24 @@ const Register = props => {
       ImagePicker.showImagePicker(options, async (response) => {
         console.log('Response = ', response.uri);
         if (response.didCancel) {
-          alert('User cancelled image picker');
+          ToastAndroid.show('You cancelled image picker', ToastAndroid.SHORT);
         } else if (response.error) {
-          alert('ImagePicker Error: ', response.error);
+          ToastAndroid.show('ImagePicker Error: '+ response.error, ToastAndroid.SHORT);
         } else if (response.customButton) {
-          alert('User tapped custom button: ', response.customButton);
+          ToastAndroid.show('User tapped custom button', ToastAndroid.SHORT);
         } else {
           const uri = decodeURI(response.uri)
           const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : response.path;
+          setLoadImage(true);
           let uploadUrl = await firebaseSDK.uploadImage(uploadUri);
-          // setUser({...user, avatar: uploadUrl });
-          // console.log(user)
           await firebaseSDK.updateAvatar(uploadUrl);
+          setLoadImage(false);
         }
       });
 		} catch (err) {
-			console.log('onImageUpload error:' + err.message);
-			alert('Upload image error:' + err.message);
+      console.log('onImageUpload error:' + err.message);
+			ToastAndroid.show('Upload image error:' + err.message, ToastAndroid.SHORT);
+      setLoadImage(false);
 		}
 	};
 
@@ -58,6 +63,7 @@ const Register = props => {
   return (
     <Container style={{ justifyContent: 'center' }}>
       <Content>
+      <Text style={style.title}>Register</Text>
         <Form style={style.form}>
           <Label>Email</Label>
           <Item regular>
@@ -81,10 +87,13 @@ const Register = props => {
               onChangeText={(v) => setUser({ ...user, password: v })}
             />
           </Item>
-          <Button success onPress={onImageUpload} style={{ justifyContent: 'center' }}>
+          <Button success onPress={onImageUpload} style={{ justifyContent: 'center' }}
+          disabled={loadImage}>
+          {loadImage && <Spinner style={style.loader} size={24} /> }
             <Text>upload</Text>
           </Button>
           <Button
+            disabled={loadImage}
             success
             onPress={onPressCreate}
             style={{ justifyContent: 'center' }}>
@@ -115,4 +124,5 @@ const style = StyleSheet.create({
     height: 400,
     justifyContent: 'space-around',
   },
+  title:{alignSelf:'center',fontSize:24,fontWeight:'bold', marginTop:32},
 });

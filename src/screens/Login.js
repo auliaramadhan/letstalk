@@ -1,38 +1,42 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Container, Form, Input, Item, Label, Button} from 'native-base';
+import {View, Text, StyleSheet, Modal} from 'react-native';
+import {Container, Form, Input, Item, Label, Button, Spinner} from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
 
 const Login = props => {
   const [input, setInput] = useState({});
-
+  const [modalVisible, setmodalVisible] = useState(false)
+  
 
   useEffect(() => {
     if (firebaseSDK.uid) {
       props.navigation.navigate('MainScreen');
     }
-  }, [])
+  }, []);
 
   const onPressLogin = async () => {
+    setmodalVisible(true)
     if (input.email && input.password) {
       const response = firebaseSDK.login(input, loginSuccess, loginFailed);
     } else {
-      alert('fill out the form first')
+      alert('fill out the form first');
     }
-
   };
 
   const loginSuccess = () => {
+    setmodalVisible(false)
     console.log('login successful, navigate to chat.');
     props.navigation.navigate('MainScreen');
   };
 
-  const loginFailed = (err) => {
+  const loginFailed = err => {
+    setmodalVisible(false)
     alert('Login failure. Please tried again.' + err);
   };
 
   return (
     <Container style={{justifyContent: 'center'}}>
+      <Text style={style.title}>Login</Text>
       <Form style={style.form}>
         <Label>Email</Label>
         <Item regular>
@@ -72,6 +76,11 @@ const Login = props => {
           <Text style={{textDecorationLine: 'underline'}}>Sign up here</Text>
         </Text>
       </Button>
+      <Modal animationType="slide" transparent visible={modalVisible}>
+          <View style={{backgroundColor:'rgba(0,0,0,.1)', height:'100%', justifyContent:'center'}}>
+          <Spinner />
+          </View>
+      </Modal>
     </Container>
   );
 };
@@ -86,4 +95,5 @@ const style = StyleSheet.create({
     height: 300,
     justifyContent: 'space-around',
   },
+  title:{alignSelf:'center',fontSize:24,fontWeight:'bold', marginTop:32}
 });

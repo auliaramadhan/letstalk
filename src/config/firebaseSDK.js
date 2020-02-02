@@ -1,6 +1,7 @@
 /* eslint-disable no-trailing-spaces */
 import uuid from 'uuid';
 import firebase from 'react-native-firebase';
+import { ToastAndroid } from 'react-native';
 
 class FirebaseService {
   async login(user, success_callback, failed_callback) {
@@ -93,16 +94,15 @@ class FirebaseService {
         .database()
         .ref()
         .child('user/' + userf.uid)
-        .child('avatar')
-        .set(url);
+        .update({avatar:url});
       userf.updateProfile({photoURL: url}).then(
         function() {
           console.log('Updated avatar successfully. url:' + url);
-          alert('Avatar image is saved successfully.');
+          ToastAndroid.show('Avatar image is saved successfully', ToastAndroid.SHORT);
         },
         function(error) {
           console.warn('Error update avatar.');
-          alert('Error update avatar. Error:' + error.message);
+          ToastAndroid.show('Error update avatar. Error:' + error.message, ToastAndroid.SHORT);
         },
         console.log(userf),
       );
@@ -159,12 +159,12 @@ class FirebaseService {
   }
 
   parse(snapshot) {
-    const {timestamp: numberStamp, text, user} = snapshot.val();
+    const {createdAt, text, user} = snapshot.val();
     const {key: _id} = snapshot;
-    const timestamp = new Date(numberStamp);
+    // const timestamp = new Date(numberStamp);
     const message = {
       _id,
-      timestamp,
+      createdAt,
       text,
       user,
     };

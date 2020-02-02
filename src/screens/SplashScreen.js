@@ -1,11 +1,14 @@
 import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, StatusBar} from 'react-native';
 import Icon from 'react-native-vector-icons/Entypo';
+import firebaseSDK from '../config/firebaseSDK';
 
 const SplashScreen = props => {
   useEffect(() => {
     setTimeout(() => {
-      props.navigation.navigate('Login');
+      if (firebaseSDK.uid) {
+        props.navigation.navigate('MainScreen');
+      }else props.navigation.navigate('Login');
     }, 2000);
   }, [props.navigation]);
   return (

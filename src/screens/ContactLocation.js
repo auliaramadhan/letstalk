@@ -40,10 +40,10 @@ export default class Maps extends Component {
     firebase
       .database()
       .ref('user')
-      .once('child_changed', result => {
+      .on('child_added', result => {
         let data = result.val();
-        console.log(data);
-        if (data !== null && data.id != uid) {
+        console.log('hasi ',data);
+        if (data !== null && data.token != uid) {
           this.setState(prevData => {
             return {userList: [...prevData.userList, data]};
           });
@@ -107,6 +107,8 @@ export default class Maps extends Component {
             .update({
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
+            }).then(data =>{
+              ToastAndroid.show('your location has been updated', ToastAndroid.SHORT)
             });
           this.setState({
             mapRegion: region,
@@ -130,6 +132,7 @@ export default class Maps extends Component {
   };
 
   render() {
+    console.log(this.state.userList)
     return (
       <MapView
         style={{width: '100%', height: '100%'}}
@@ -157,16 +160,15 @@ export default class Maps extends Component {
               longitude: item.longitude || 0,
             }}
             onCalloutPress={() => {
-              this.props.navigation.navigate('FriendProfile', {
-                item,
+              this.props.navigation.navigate('UserDetail', {
+                data:item,
               });
             }}>
             <View>
               <Image
-                source={{uri: item.photo}}
+                source={{uri: item.avatar}}
                 style={{width: 40, height: 40, borderRadius: 50}}
               />
-              <Text>{item.name}</Text>
             </View>
           </Marker>
         ))}

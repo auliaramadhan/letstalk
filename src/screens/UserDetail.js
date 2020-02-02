@@ -50,7 +50,7 @@ const Profile = props => {
             />
           )}
           {!user.photoURL && (
-            <Icon name="envelope" size={128} style={{alignSelf: 'center'}} />
+            <Icon name="user" size={128} style={{alignSelf: 'center'}} />
           )}
           <ListItem thumbnail noBorder>
             <Icon name="envelope" size={30} />
