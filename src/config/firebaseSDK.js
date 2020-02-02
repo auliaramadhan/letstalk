@@ -8,6 +8,7 @@ class FirebaseService {
       .auth()
       .signInWithEmailAndPassword(user.email, user.password)
       .then(success_callback, failed_callback);
+      console.log(firebase.auth().currentUser)
   }
 
   async createAccount(user) {
@@ -23,8 +24,8 @@ class FirebaseService {
               user.name,
           );
           var userf = firebase.auth().currentUser;
-          console.log(userf.uid)
-          const uid = userf.uid
+          console.log(userf.uid);
+          const uid = userf.uid;
           firebase
             .database()
             .ref('user')
@@ -62,7 +63,8 @@ class FirebaseService {
       console.log(`image =  ${uri}`);
       const ref = await firebase
         .storage()
-        .ref('image').child('avatar')
+        .ref('image')
+        .child('avatar')
         .child(uuid.v4());
       const task = await ref.put(uri);
       console.log('hasil ' + task);
@@ -77,8 +79,10 @@ class FirebaseService {
     if (userf != null) {
       firebase
         .database()
-        .ref().child('user/' + userf.uid)
-        .child('avatar').set(url);
+        .ref()
+        .child('user/' + userf.uid)
+        .child('avatar')
+        .set(url);
       userf.updateProfile({photoURL: url}).then(
         function() {
           console.log('Updated avatar successfully. url:' + url);
@@ -96,11 +100,76 @@ class FirebaseService {
     }
   }
 
-  userList(setData){
-    const uid = firebase.auth().currentUser.uid;
-    firebase.database().ref().child('user').once('value' , snapshot=>{
-        setData(Object.values(snapshot.val()).filter(v => v.token !== uid));
-    })
+  userList(setData) {
+    firebase
+      .database()
+      .ref()
+      .child('user')
+      .once('value', snapshot => {
+        setData(Object.values(snapshot.val()).filter(v => v.token !== this.uid));
+      });
+  }
+
+  // ------DI BAWAH INI BUAT CHAT AJA -----
+  get timestamp() {
+    return firebase.database.ServerValue.TIMESTAMP;
+  }
+  get currentUser() {
+    return (firebase.auth().currentUser || {});
+  }
+  get uid() {
+    return (firebase.auth().currentUser || {}).uid;
+  }
+  get ref() {
+    return firebase.database().ref('messages');
+  }
+
+  send(messages, uidreceive) {
+    console.log(uidreceive)
+    for (let i = 0; i < messages.length; i++) {
+      const {text, user} = messages[i];
+      const message = {
+        text,
+        user,
+        createdAt: this.timestamp,
+      };
+      this.ref
+        .child(this.uid)
+        .child(uidreceive)
+        .push(message);
+      this.ref
+        .child(uidreceive)
+        .child(this.uid)
+        .push(message);
+    }
+  }
+
+  parse(snapshot) {
+    const {timestamp: numberStamp, text, user} = snapshot.val();
+    const {key: _id} = snapshot;
+    const timestamp = new Date(numberStamp);
+    const message = {
+      _id,
+      timestamp,
+      text,
+      user,
+    };
+    return message;
+  }
+
+  on(receiveuid, callback) {
+    return this.ref
+      .child(this.uid)
+      .child(receiveuid)
+      .limitToLast(20)
+      .on('child_added', snapshot => {
+        console.log('snapshot', snapshot.val())
+        callback(this.parse(snapshot))
+      });
+  }
+
+  off() {
+    this.ref.child(this.uid).off();
   }
 }
 

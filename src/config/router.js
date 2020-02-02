@@ -16,7 +16,6 @@ import Chat from '../screens/Chat';
 
 const ChatStack = createStackNavigator({
   MainScreen,
-  Chat
   
 });
 
@@ -24,17 +23,21 @@ const LocationStack = createStackNavigator({
   ContactLocation,
 });
 
-const ProfileStack = createStackNavigator({
-  Profile,
+const ProfileStack = createStackNavigator(
+  {
+    Profile,
+  },
+  {
+    headerMode: 'none',
+  },
+);
+
+const AuthStack = createStackNavigator({
+  Login,
+  Register,
 },{
   headerMode:'none'
 });
-
-const AuthStack = createStackNavigator({
-   Login,
-   Register
-
-})
 
 const BottomTab = createBottomTabNavigator({
   ChatStack: {
@@ -84,13 +87,24 @@ const BottomTab = createBottomTabNavigator({
   },
 });
 
-const SwitchContainer = createSwitchNavigator({
-  SplashScreen,
-  BottomTab,
-  AuthStack,
-},{
-   initialRouteName:'BottomTab'
-}
+const AppStack = createStackNavigator(
+  {
+    BottomTab,
+    Chat,
+  },{
+   headerMode:'none' 
+  }
+)
+
+const SwitchContainer = createSwitchNavigator(
+  {
+    SplashScreen,
+    AppStack,
+    AuthStack,
+  },
+  {
+    initialRouteName: 'AuthStack',
+  },
 );
 
 const AppContainer = createAppContainer(SwitchContainer);

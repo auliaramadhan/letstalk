@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Container, Form, Input, Item, Label, Button} from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
@@ -6,14 +6,15 @@ import firebaseSDK from '../config/firebaseSDK';
 const Login = props => {
   const [input, setInput] = useState({});
 
+
+  useEffect(() => {
+    if (firebaseSDK.uid) {
+      props.navigation.navigate('MainScreen');
+    }
+  }, [])
+
   const onPressLogin = async () => {
-    // const user = {
-    //   name: this.state.name,
-    //   email: this.state.email,
-    //   password: this.state.password,
-    //   avatar: this.state.avatar,
-    // };
-    if (input.username && input.password) {
+    if (input.email && input.password) {
       const response = firebaseSDK.login(input, loginSuccess, loginFailed);
     } else {
       alert('fill out the form first')
@@ -23,11 +24,11 @@ const Login = props => {
 
   const loginSuccess = () => {
     console.log('login successful, navigate to chat.');
-    this.props.navigation.navigate('Chat', {data:input});
+    props.navigation.navigate('MainScreen');
   };
 
-  const loginFailed = () => {
-    alert('Login failure. Please tried again.');
+  const loginFailed = (err) => {
+    alert('Login failure. Please tried again.' + err);
   };
 
   return (
@@ -57,7 +58,7 @@ const Login = props => {
         </Item>
         <Button
           success
-          onPress={() => props.navigation.navigate('MainScreen')}
+          onPress={onPressLogin}
           style={{justifyContent: 'center'}}>
           <Text>Login</Text>
         </Button>

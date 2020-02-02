@@ -17,10 +17,13 @@ const MainScreen = props => {
           <FlatList
             data={userList}
             renderItem={({item}) => (
-              <ListItem thumbnail>
+              <ListItem
+                thumbnail
+                onPress={() => props.navigation.navigate('Chat', {data: item})}
+                button>
                 <Left style={{flex: 1, justifyContent: 'center'}}>
                   {item.avatar ? (
-                    <Thumbnail source={{uri: item.avatar}} />
+                    <Thumbnail source={{uri: item.avatar}}  />
                   ) : (
                     <Icon name="user" size={48} />
                   )}
@@ -31,41 +34,13 @@ const MainScreen = props => {
                 </Body>
               </ListItem>
             )}
-            // keyExtractor={item => item.id.token}
+            keyExtractor={item => item.token}
           />
         )}
       </View>
     </>
   );
 };
-
-const contact = [
-  {
-    id: 1,
-    name: 'User 1',
-    chat: 'Hello',
-  },
-  {
-    id: 2,
-    name: 'User 2',
-    chat: 'Hi',
-  },
-  {
-    id: 3,
-    name: 'User 3',
-    chat: 'Bonjour',
-  },
-  {
-    id: 4,
-    name: 'User 4',
-    chat: 'Namaste',
-  },
-  {
-    id: 5,
-    name: 'User 5',
-    chat: 'Ni Hao',
-  },
-];
 
 MainScreen.navigationOptions = {
   title: 'Chat',
