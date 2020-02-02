@@ -93,9 +93,6 @@ const Profile = props => {
               </Item>
             </Body>
           </ListItem>
-          <Button success style={{justifyContent: 'center'}}>
-            <Text>Save</Text>
-          </Button>
         </Form>
       </Content>
     </Container>

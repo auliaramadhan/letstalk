@@ -1,49 +1,63 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import {GiftedChat} from 'react-native-gifted-chat';
-import {Container} from 'native-base';
+import {
+  Container,
+  Header,
+  Left,
+  Button,
+  Icon,
+  Body,
+  Title,
+  Thumbnail,
+  Text,
+} from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
 import firebase from 'react-native-firebase';
 
-// const Chat = (props) => {
-
-//   const [messages, setMessages] = useState([])
-//   useEffect(() => {
-//     firebaseSDK.on(props.navigation.state.params.data.token,
-//       newMessage => setMessages(GiftedChat.append( messages,newMessage)))
-//   }, [])
-
-//   return (
-
-//   );
-// };
-
-class Chat extends React.Component<Props> {
+class Chat extends React.Component {
   state = {
     messages: [],
   };
   render() {
+    const data = this.props.navigation.state.params.data;
     return (
-      <GiftedChat
-        onSend={message =>
-          firebaseSDK.send(
-            message,
-            this.props.navigation.state.params.data.token,
-          )
-        }
-        user={{
-          name: firebaseSDK.currentUser.displayName,
-          avatar: firebaseSDK.currentUser.photoURL,
-          _id: firebaseSDK.currentUser.uid,
-        }}
-        messages={this.state.messages}
-      />
+      <Container>
+        <Header style={{backgroundColor:'#fff', height:64}} >
+          <Left>
+            <Button
+              transparent
+              onPress={() =>
+                this.props.navigation.navigate('UserDetail', {data})
+              }>
+              <Thumbnail source={{uri: data.avatar}} style={{padding:16}} />
+            </Button>
+          </Left>
+            <Body>
+              <Title style={{color:'#111'}}> {data.name} </Title>
+              <Text note> {data.email} </Text>
+            </Body>
+        </Header>
+        <GiftedChat
+          onSend={message =>
+            firebaseSDK.send(
+              message,
+              this.props.navigation.state.params.data.token,
+            )
+          }
+          user={{
+            name: firebaseSDK.currentUser.displayName,
+            avatar: firebaseSDK.currentUser.photoURL,
+            _id: firebaseSDK.currentUser.uid,
+          }}
+          messages={this.state.messages}
+        />
+      </Container>
     );
   }
 
   componentDidMount() {
-    firebaseSDK.on(this.props.navigation.state.params.data.token ,
-       message =>
+    firebaseSDK.on(this.props.navigation.state.params.data.token, message =>
       this.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, message),
       })),

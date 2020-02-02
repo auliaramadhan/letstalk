@@ -8,7 +8,19 @@ class FirebaseService {
       .auth()
       .signInWithEmailAndPassword(user.email, user.password)
       .then(success_callback, failed_callback);
-      console.log(firebase.auth().currentUser)
+  }
+
+  onLogout(goback) {
+    firebase
+      .auth()
+      .signOut()
+      .then(function() {
+        console.log('Sign-out successful.');
+        goback('Login');
+      })
+      .catch(function(error) {
+        alert('An error happened when signing out');
+      });
   }
 
   async createAccount(user) {
@@ -106,7 +118,9 @@ class FirebaseService {
       .ref()
       .child('user')
       .once('value', snapshot => {
-        setData(Object.values(snapshot.val()).filter(v => v.token !== this.uid));
+        setData(
+          Object.values(snapshot.val()).filter(v => v.token !== this.uid),
+        );
       });
   }
 
@@ -115,7 +129,7 @@ class FirebaseService {
     return firebase.database.ServerValue.TIMESTAMP;
   }
   get currentUser() {
-    return (firebase.auth().currentUser || {});
+    return firebase.auth().currentUser || {};
   }
   get uid() {
     return (firebase.auth().currentUser || {}).uid;
@@ -125,7 +139,7 @@ class FirebaseService {
   }
 
   send(messages, uidreceive) {
-    console.log(uidreceive)
+    console.log(uidreceive);
     for (let i = 0; i < messages.length; i++) {
       const {text, user} = messages[i];
       const message = {
@@ -163,8 +177,8 @@ class FirebaseService {
       .child(receiveuid)
       .limitToLast(20)
       .on('child_added', snapshot => {
-        console.log('snapshot', snapshot.val())
-        callback(this.parse(snapshot))
+        console.log('snapshot', snapshot.val());
+        callback(this.parse(snapshot));
       });
   }
 

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, StatusBar, FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import firebaseSDK from '../config/firebaseSDK';
-import {ListItem, Left, Thumbnail, Body} from 'native-base';
+import {ListItem, Left, Thumbnail, Body, Content, Container} from 'native-base';
 
 const MainScreen = props => {
   const [userList, setUserList] = useState({});
@@ -10,9 +10,9 @@ const MainScreen = props => {
     firebaseSDK.userList(setUserList);
   }, []);
   return (
-    <>
-      <StatusBar barStyle="light-content" backgroundColor="#006b3a" />
-      <View style={styles.root}>
+    <Container>
+      {/* <StatusBar barStyle="light-content" backgroundColor="#006b3a" /> */}
+      <Content style={styles.root}>
         {userList && (
           <FlatList
             data={userList}
@@ -37,8 +37,8 @@ const MainScreen = props => {
             keyExtractor={item => item.token}
           />
         )}
-      </View>
-    </>
+      </Content>
+    </Container>
   );
 };
 

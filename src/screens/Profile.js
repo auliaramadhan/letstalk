@@ -141,10 +141,10 @@ const Profile = props => {
             </Body>
           </ListItem>
           <Button
-            onPress={updateProfile}
+            onPress={()=>firebaseSDK.onLogout(props.navigation.navigate)}
             success
             style={{justifyContent: 'center'}}>
-            <Text>Save</Text>
+            <Text>Logout</Text>
           </Button>
         </Form>
       </Content>

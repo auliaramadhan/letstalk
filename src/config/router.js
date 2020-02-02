@@ -13,6 +13,7 @@ import Profile from '../screens/Profile';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
 import Chat from '../screens/Chat';
+import UserDetail from '../screens/UserDetail';
 
 const ChatStack = createStackNavigator({
   MainScreen,
@@ -91,6 +92,7 @@ const AppStack = createStackNavigator(
   {
     BottomTab,
     Chat,
+    UserDetail
   },{
    headerMode:'none' 
   }
