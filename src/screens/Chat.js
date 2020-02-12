@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {View, Clipboard, Alert} from 'react-native';
 import {GiftedChat} from 'react-native-gifted-chat';
 import {
   Container,
@@ -19,24 +19,29 @@ class Chat extends React.Component {
   state = {
     messages: [],
   };
+
   render() {
     const data = this.props.navigation.state.params.data;
     return (
       <Container>
-        <Header style={{backgroundColor:'#fff', height:64}} >
+        <Header style={{height: 64}}>
           <Left>
             <Button
               transparent
               onPress={() =>
                 this.props.navigation.navigate('UserDetail', {data})
               }>
-              <Thumbnail source={{uri: data.avatar}} style={{padding:16}} />
+              {data.avatar ? (
+                <Thumbnail source={{uri: data.avatar}} style={{padding: 16}} />
+              ) : (
+                <Icon name="user" type="FontAwesome5" style={{padding: 16}} />
+              )}
             </Button>
           </Left>
-            <Body>
-              <Title style={{color:'#111'}}> {data.name} </Title>
-              <Text note> {data.email} </Text>
-            </Body>
+          <Body>
+            <Title> {data.name} </Title>
+            <Text note> {data.email} </Text>
+          </Body>
         </Header>
         <GiftedChat
           onSend={message =>
@@ -50,9 +55,61 @@ class Chat extends React.Component {
             avatar: firebaseSDK.currentUser.photoURL,
             _id: firebaseSDK.currentUser.uid,
           }}
+          onLongPress={this.onLongPress.bind(this)}
           messages={this.state.messages}
         />
       </Container>
+    );
+  }
+
+  onLongPress(context, message) {
+    const options = ['Delete Message', 'Copy Message', 'Cancel'];
+    const cancelButtonIndex = options.length - 1;
+    context.actionSheet().showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      buttonIndex => {
+        switch (buttonIndex) {
+          case 0:
+            Alert.alert(
+              'Confirm',
+              'sure want to delete this?',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel',
+                },
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    firebaseSDK.delete(
+                      message,
+                      this.props.navigation.state.params.data.token,
+                    );
+                    this.setState(previousState => {
+                      console.log(previousState);
+                      return {
+                        messages: previousState.messages.filter(
+                          v => v._id !== message._id,
+                        ),
+                      };
+                    });
+                  },
+                },
+              ],
+              {cancelable: false},
+            );
+
+            break;
+          case 1:
+            Clipboard.setString(message.text);
+          default:
+            break;
+        }
+      },
     );
   }
 

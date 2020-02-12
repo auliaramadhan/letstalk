@@ -17,12 +17,11 @@ import UserDetail from '../screens/UserDetail';
 
 const ChatStack = createStackNavigator({
   MainScreen,
-  
-});
+},{headerMode:'none'});
 
 const LocationStack = createStackNavigator({
   ContactLocation,
-});
+},{headerMode:'none'});
 
 const ProfileStack = createStackNavigator(
   {
@@ -49,7 +48,7 @@ const BottomTab = createBottomTabNavigator({
         <Icon name="comments" color={tintColor} size={28} />
       ),
       tabBarOptions: {
-        activeTintColor: '#006b3a',
+        activeTintColor: '#00b',
         labelStyle: {
           fontWeight: 'bold',
         },
@@ -64,7 +63,7 @@ const BottomTab = createBottomTabNavigator({
         <Icon name="map-marker" color={tintColor} size={28} />
       ),
       tabBarOptions: {
-        activeTintColor: '#006b3a',
+        activeTintColor: '#00b',
         labelStyle: {
           fontWeight: 'bold',
         },
@@ -79,7 +78,7 @@ const BottomTab = createBottomTabNavigator({
         <Icon name="user" color={tintColor} size={28} />
       ),
       tabBarOptions: {
-        activeTintColor: '#006b3a',
+        activeTintColor: '#00b',
         labelStyle: {
           fontWeight: 'bold',
         },
@@ -100,12 +99,12 @@ const AppStack = createStackNavigator(
 
 const SwitchContainer = createSwitchNavigator(
   {
-    SplashScreen,
+    // SplashScreen:{screen:SplashScreen},
     AppStack,
     AuthStack,
   },
   {
-    initialRouteName: 'SplashScreen',
+    initialRouteName: 'AuthStack',
   },
 );
 

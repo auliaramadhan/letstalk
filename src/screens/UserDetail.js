@@ -18,6 +18,9 @@ import {
   ListItem,
   Body,
   Left,
+  Header,
+  Title,
+  Thumbnail,
 } from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
 import firebase from 'react-native-firebase';
@@ -33,13 +36,26 @@ const Profile = props => {
       email,
       avatar: photoURL,
     } = props.navigation.state.params.data;
-    setUser({displayName, phoneNumber, email, photoURL});
+    setUser(props.navigation.state.params.data);
   }, []);
 
   console.log(user);
 
   return (
     <Container>
+      <Header style={{height: 64}}>
+        <Left>
+          {user.avatar ? (
+            <Thumbnail source={{uri: user.avatar}} style={{padding: 16}} />
+          ) : (
+            <Icon name="user" type="FontAwesome5" style={{padding: 16,fontSize:24,color:'#fff'}} />
+          )}
+        </Left>
+        <Body>
+          <Title> {user.name} </Title>
+          <Text style={{color:'#aaa'}}> {user.email} </Text>
+        </Body>
+      </Header>
       <Content>
         <Form style={style.form}>
           {user.photoURL && (
@@ -74,8 +90,8 @@ const Profile = props => {
                 <Label>Name</Label>
                 <Input
                   placeholder="username"
-                  value={user.displayName}
-                  onChangeText={v => setUser({...user, displayName: v})}
+                  value={user.name}
+                  onChangeText={v => setUser({...user, name: v})}
                 />
               </Item>
             </Body>

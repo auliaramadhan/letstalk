@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Platform, ToastAndroid } from 'react-native';
-import { Container, Form, Input, Item, Label, Button, Content, Spinner } from 'native-base';
+import { Container, Form, Input, Item, Label, Button, Content, Spinner, Title } from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
 import ImagePicker from 'react-native-image-picker'
 
@@ -41,9 +41,14 @@ const Register = props => {
           ToastAndroid.show('You cancelled image picker', ToastAndroid.SHORT);
         } else if (response.error) {
           ToastAndroid.show('ImagePicker Error: '+ response.error, ToastAndroid.SHORT);
+        } else if (response.fileSize > 2*1024*1024) {
+          ToastAndroid.show('FIle must not be higher than 2 mb', ToastAndroid.LONG);
         } else if (response.customButton) {
           ToastAndroid.show('User tapped custom button', ToastAndroid.SHORT);
         } else {
+          if(firebaseSDK.uid){
+            ToastAndroid('Please Register first before upload',ToastAndroid.SHORT); return;
+          }
           const uri = decodeURI(response.uri)
           const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : response.path;
           setLoadImage(true);
@@ -66,7 +71,7 @@ const Register = props => {
       <Text style={style.title}>Register</Text>
         <Form style={style.form}>
           <Label>Email</Label>
-          <Item regular>
+          <Item regular style={style.input}>
             <Input placeholder="email"
             keyboardType='email-address'
               value={user.email}
@@ -74,30 +79,30 @@ const Register = props => {
             />
           </Item>
           <Label>Name</Label>
-          <Item regular>
+          <Item regular style={style.input}>
             <Input placeholder="username"
               value={user.name}
               onChangeText={(v) => setUser({ ...user, name: v })}
             />
           </Item>
           <Label>Password</Label>
-          <Item regular>
+          <Item regular style={style.input}>
             <Input secureTextEntry={true} placeholder="password"
               value={user.password}
               onChangeText={(v) => setUser({ ...user, password: v })}
             />
           </Item>
-          <Button success onPress={onImageUpload} style={{ justifyContent: 'center' }}
+          <Button primary onPress={onImageUpload} style={{ justifyContent: 'center' }}
           disabled={loadImage}>
           {loadImage && <Spinner style={style.loader} size={24} /> }
-            <Text>upload</Text>
+            <Text style={{color:'#fff'}}>upload</Text>
           </Button>
           <Button
             disabled={loadImage}
-            success
+            primary
             onPress={onPressCreate}
             style={{ justifyContent: 'center' }}>
-            <Text>Register</Text>
+            <Title>Register</Title>
           </Button>
         </Form>
       </Content>
@@ -124,5 +129,7 @@ const style = StyleSheet.create({
     height: 400,
     justifyContent: 'space-around',
   },
-  title:{alignSelf:'center',fontSize:24,fontWeight:'bold', marginTop:32},
+  title:{alignSelf:'center',fontSize:24,fontWeight:'bold', color:'#0f0fff' , marginTop:32},
+  input:{borderRadius:4, backgroundColor:'#fafafafa'},
+
 });

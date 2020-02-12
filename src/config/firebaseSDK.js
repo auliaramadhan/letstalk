@@ -1,7 +1,7 @@
 /* eslint-disable no-trailing-spaces */
 import uuid from 'uuid';
 import firebase from 'react-native-firebase';
-import { ToastAndroid } from 'react-native';
+import {ToastAndroid} from 'react-native';
 
 class FirebaseService {
   async login(user, success_callback, failed_callback) {
@@ -94,15 +94,21 @@ class FirebaseService {
         .database()
         .ref()
         .child('user/' + userf.uid)
-        .update({avatar:url});
+        .update({avatar: url});
       userf.updateProfile({photoURL: url}).then(
         function() {
           console.log('Updated avatar successfully. url:' + url);
-          ToastAndroid.show('Avatar image is saved successfully', ToastAndroid.SHORT);
+          ToastAndroid.show(
+            'Avatar image is saved successfully',
+            ToastAndroid.SHORT,
+          );
         },
         function(error) {
           console.warn('Error update avatar.');
-          ToastAndroid.show('Error update avatar. Error:' + error.message, ToastAndroid.SHORT);
+          ToastAndroid.show(
+            'Error update avatar. Error:' + error.message,
+            ToastAndroid.SHORT,
+          );
         },
         console.log(userf),
       );
@@ -138,7 +144,20 @@ class FirebaseService {
     return firebase.database().ref('messages');
   }
 
-  send(messages, uidreceive) {
+  delete(message, uidreceive) {
+    this.ref
+      .child(this.uid)
+      .child(uidreceive)
+      .child(message._id)
+      .remove();
+    this.ref
+      .child(uidreceive)
+      .child(this.uid)
+      .child(message._id)
+      .remove();
+  }
+
+  async send(messages, uidreceive) {
     console.log(uidreceive);
     for (let i = 0; i < messages.length; i++) {
       const {text, user} = messages[i];
@@ -147,14 +166,15 @@ class FirebaseService {
         user,
         createdAt: this.timestamp,
       };
-      this.ref
+      const key = await this.ref
         .child(this.uid)
         .child(uidreceive)
-        .push(message);
+        .push(message).key;
       this.ref
         .child(uidreceive)
         .child(this.uid)
-        .push(message);
+        .child(key)
+        .set(message);
     }
   }
 
@@ -177,7 +197,6 @@ class FirebaseService {
       .child(receiveuid)
       .limitToLast(20)
       .on('child_added', snapshot => {
-        console.log('snapshot', snapshot.val());
         callback(this.parse(snapshot));
       });
   }

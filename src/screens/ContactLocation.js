@@ -13,6 +13,7 @@ import MapView, {Marker} from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import firebase from 'react-native-firebase';
 import firebaseSDK from '../config/firebaseSDK';
+import {Spinner, Container} from 'native-base';
 
 const {width, height} = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -42,7 +43,7 @@ export default class Maps extends Component {
       .ref('user')
       .on('child_added', result => {
         let data = result.val();
-        console.log('hasi ',data);
+        console.log('hasi ', data);
         if (data !== null && data.token != uid) {
           this.setState(prevData => {
             return {userList: [...prevData.userList, data]};
@@ -107,8 +108,12 @@ export default class Maps extends Component {
             .update({
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
-            }).then(data =>{
-              ToastAndroid.show('your location has been updated', ToastAndroid.SHORT)
+            })
+            .then(data => {
+              ToastAndroid.show(
+                'your location has been updated',
+                ToastAndroid.SHORT,
+              );
             });
           this.setState({
             mapRegion: region,
@@ -132,47 +137,51 @@ export default class Maps extends Component {
   };
 
   render() {
-    console.log(this.state.userList)
+    console.log(this.state.userList);
     return (
-      <MapView
-        style={{width: '100%', height: '100%'}}
-        showsMyLocationButton={true}
-        showsIndoorLevelPicker={true}
-        showsUserLocation={true}
-        zoomControlEnabled={true}
-        showsCompass={true}
-        showsTraffic={true}
-        region={this.state.mapRegion}
-        initialRegion={{
-          latitude: -7.755322,
-          longitude: 110.381174,
-          latitudeDelta: LATITUDE_DELTA,
-          longitudeDelta: LONGITUDE_DELTA,
-        }}>
-        {this.state.userList.map(item => (
-          <Marker
-            key={item.id}
-            title={item.name}
-            description={item.status}
-            draggable
-            coordinate={{
-              latitude: item.latitude || 0,
-              longitude: item.longitude || 0,
-            }}
-            onCalloutPress={() => {
-              this.props.navigation.navigate('UserDetail', {
-                data:item,
-              });
+      <Container>
+        {this.state.userList === 0 ?<Spinner />
+        : (
+          <MapView
+            style={{width: '100%', height: '100%'}}
+            showsMyLocationButton={true}
+            showsIndoorLevelPicker={true}
+            showsUserLocation={true}
+            zoomControlEnabled={true}
+            showsCompass={true}
+            showsTraffic={true}
+            region={this.state.mapRegion}
+            initialRegion={{
+              latitude: -7.755322,
+              longitude: 110.381174,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA,
             }}>
-            <View>
-              <Image
-                source={{uri: item.avatar}}
-                style={{width: 40, height: 40, borderRadius: 50}}
-              />
-            </View>
-          </Marker>
-        ))}
-      </MapView>
+            {this.state.userList.map(item => (
+              <Marker
+                key={item.token}
+                title={item.name}
+                draggable
+                coordinate={{
+                  latitude: item.latitude || 0,
+                  longitude: item.longitude || 0,
+                }}
+                onCalloutPress={() => {
+                  this.props.navigation.navigate('UserDetail', {
+                    data: item,
+                  });
+                }}>
+                <View>
+                  <Image
+                    source={{uri: item.avatar}}
+                    style={{width: 40, height: 40, borderRadius: 50}}
+                  />
+                </View>
+              </Marker>
+            ))}
+          </MapView>
+        )}
+      </Container>
     );
   }
 }

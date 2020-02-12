@@ -21,6 +21,9 @@ import {
   Left,
   Spinner,
   List,
+  Header,
+  Title,
+  Right,
 } from 'native-base';
 import firebaseSDK from '../config/firebaseSDK';
 import firebase from 'react-native-firebase';
@@ -42,7 +45,6 @@ const Profile = props => {
       });
   }, []);
 
-
   const onImageUpload = () => {
     const options = {
       title: 'Select Avatar',
@@ -51,14 +53,24 @@ const Profile = props => {
         path: 'images',
       },
     };
+    if (loadImage) {
+      ToastAndroid('please wait until finised', ToastAndroid.SHORT);
+      return;
+    }
     try {
       ImagePicker.showImagePicker(options, async response => {
+        console.log(response);
         if (response.didCancel) {
           ToastAndroid.show('You cancelled image picker', ToastAndroid.SHORT);
         } else if (response.error) {
           ToastAndroid.show(
             'ImagePicker Error: ' + response.error,
             ToastAndroid.SHORT,
+          );
+        } else if (response.fileSize > 2 * 1024 * 1024) {
+          ToastAndroid.show(
+            'FIle must not be higher than 2 mb',
+            ToastAndroid.LONG,
           );
         } else if (response.customButton) {
           ToastAndroid.show('User tapped custom button', ToastAndroid.SHORT);
@@ -80,6 +92,7 @@ const Profile = props => {
   };
 
   const updateProfile = async () => {
+    setLoadImage(true);
     const userf = firebase.auth().currentUser;
     userf.updateProfile({displayName: user.name}).then(
       function() {
@@ -88,12 +101,13 @@ const Profile = props => {
           .ref('user')
           .child(userf.uid)
           .update({name: user.name, phoneNumber: user.phoneNumber});
-        ToastAndroid.show('edited',ToastAndroid.SHORT);
+        ToastAndroid.show('edited', ToastAndroid.SHORT);
       },
       function(error) {
         ToastAndroid.show('error in database', ToastAndroid.SHORT);
       },
     );
+    setLoadImage(false);
   };
 
   return (
@@ -105,8 +119,10 @@ const Profile = props => {
           borderRadius={64}
           source={{uri: user.avatar}}
         />
-        <TouchableOpacity style={style.buttonCamera} onPress={onImageUpload}
-        disabled={loadImage}>
+        <TouchableOpacity
+          style={style.buttonCamera}
+          onPress={onImageUpload}
+          disabled={loadImage}>
           <Icon name="camera" size={24} color="white" />
         </TouchableOpacity>
         <Form style={style.form}>
@@ -143,20 +159,22 @@ const Profile = props => {
               onChangeText={v => setUser({...user, phoneNumber: v})}
             />
           </Item>
-          {initialData.name !== user.name || initialData.phoneNumber !== user.phoneNumber && (
-            <Button
-              onPress={updateProfile}
-              success
-              style={{justifyContent: 'center', marginTop: 12}}>
-              <Text>Update</Text>
-            </Button>
-          )}
+          {(initialData.name !== user.name ||
+            initialData.phoneNumber !== user.phoneNumber) &&
+            !loadImage && (
+              <Button
+                primary
+                onPress={updateProfile}
+                style={{justifyContent: 'center', marginTop: 8}}>
+                <Text style={{color: '#fff'}}>Update</Text>
+              </Button>
+            )}
         </Form>
         <Button
           onPress={() => firebaseSDK.onLogout(props.navigation.navigate)}
-          success
+          primary
           style={{justifyContent: 'center', margin: 16, marginTop: 32}}>
-          <Text>Logout</Text>
+          <Text style={{color: '#fff'}}>Logout</Text>
         </Button>
       </Content>
     </Container>
@@ -182,7 +200,7 @@ const style = StyleSheet.create({
     alignSelf: 'center',
     marginTop: -20,
     marginLeft: 64,
-    backgroundColor: '#070',
+    backgroundColor: '#00c',
     padding: 8,
     borderRadius: 30,
     zIndex: 999,
