@@ -21,18 +21,23 @@ React Native is a library framework for Javascript to create mobile app using ja
 3. run `npx react-native run-android`
 4. To build apk Project use `cd android && ./gradlew assembleRelease `
 
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+# build app
+
+You can download app here  <a href="https://drive.google.com/drive/folders/1ZZK1jy6eb_yDl97Xibj5lyaC1Rls_Sg3?usp=sharing">Gdrive</a>
 
 # Screenschot
 
-## Coming Soond
-<!-- <p float="left">
-  <img src="./mobile1.png" width="20%" style="margin-bottom:auto" />
-  <img src="./mobile2.png" width="20%" style="margin-bottom:auto"  />
-  <img src="./mobile3.png" width="20%" style="margin-bottom:auto"  />
-  <img src="./mobile4.png" width="20%" style="margin-bottom:auto"  />
+<p float="left" >
+  <img src="./letstalk1.jpg" width="24%" style="margin-bottom:auto" />
+  <img src="./letstalk2.jpg" width="24%" style="margin-bottom:auto" />
+  <img src="./letstalk3.jpg" width="24%" style="margin-bottom:auto" />
+  <img src="./letstalk4.jpg" width="24%" style="margin-bottom:auto" />
+  <img src="./letstalk5.jpg" width="24%" style="margin-bottom:auto" />
+  <img src="./letstalk6.jpg" width="24%" style="margin-bottom:auto" />
+  <img src="./letstalk7.jpg" width="24%" style="margin-bottom:auto" />
 </p>
-<img src="./gif.png" width="40%" /> -->
+<img src="./gif.png" width="40%" />
 
 
